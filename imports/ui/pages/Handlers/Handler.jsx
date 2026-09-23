@@ -1,34 +1,35 @@
-import React, { useState } from 'react';
 import {
-  Icon,
   Button,
-  Tooltip,
-  Spin,
+  Col,
+  Icon,
+  Modal,
+  notification,
   PageHeader,
-  Typography,
-  Row,
-  Tag,
   Result,
+  Row,
   Skeleton,
-  Col, notification,
-  Modal
+  Spin,
+  Tabs,
+  Tag,
+  Tooltip,
+  Typography
 } from "antd";
-import { Tabs } from 'antd';
 import { withTracker } from 'meteor/react-meteor-data';
-import HandlersCollection from '../../../api/Handlers/Handlers';
+import { Session } from 'meteor/session';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import ManageHandler from './ManageHandler';
-import AddPackage from './AddPackage';
-import ReadJs from './ReadJs';
-import DisplayTimeline from './DisplayTimeline';
-import CommentSection from './CommentSection';
+import HandlersCollection from '../../../api/Handlers/Handlers';
 import counterFormatter from '../../../modules/counterFormatter';
-import { Session } from 'meteor/session';
 import ControllerIcon from '../../icons/ControllerIcon';
 import KeyboardIcon from '../../icons/KeyboardIcon';
+import AddPackage from './AddPackage';
+import CommentSection from './CommentSection';
 import DisplayStats from './DisplayStats';
+import DisplayTimeline from './DisplayTimeline';
+import ManageHandler from './ManageHandler';
+import ReadJs from './ReadJs';
 const { Paragraph } = Typography;
 const IconText = ({ type, text, theme = 'outlined', color }) => (
   <span>
@@ -81,10 +82,26 @@ const onCheckPublic = checked => {
 };
 
 function Handler(props) {
+  const [genres, setGenres] = React.useState([]);
   const star = handlerId => {
     Meteor.call('handlers.starring', handlerId);
   };
   const handler = props.handler[0] ? props.handler[0] : false;
+
+  React.useEffect(() => {
+    if (handler) {
+      setGenres(handler.genres || []);
+      if (handler.genres && handler.genres.length > 0) {
+        return undefined;
+      }
+      Meteor.call('handlers.getGenres', handler._id, (error, result) => {
+        if (!error) {
+          setGenres(result);
+        }
+      });
+    }
+  }, [handler && handler._id]);
+
   const isMaintainer = props.user && (handler.owner === props.user._id);
   const isAdmin = props.user && Roles.userIsInRole(props.user._id, ['admin_enabled']);
 
@@ -159,7 +176,16 @@ function Handler(props) {
         {handler ? (
           <React.Fragment>
             <PageHeader
-              title={handler.gameName}
+              title={
+                <span>
+                  {handler.gameName}
+                  {genres.length > 0 && (
+                    <span style={{ marginLeft: 12, fontSize: 14, fontWeight: 400 }}>
+                      {genres.join(' / ')}
+                    </span>
+                  )}
+                </span>
+              }
               subTitle={handler.title}
               tags={
                 handler.verified ? (
