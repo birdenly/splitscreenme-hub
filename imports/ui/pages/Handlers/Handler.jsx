@@ -29,13 +29,21 @@ import CommentSection from './CommentSection';
 import DisplayStats from './DisplayStats';
 import DisplayTimeline from './DisplayTimeline';
 import ManageHandler from './ManageHandler';
-import ReadJs from './ReadJs';
 const { Paragraph } = Typography;
 const IconText = ({ type, text, theme = 'outlined', color }) => (
   <span>
     <Icon type={type} twoToneColor={color} theme={theme} style={{ marginRight: 8 }} />
     {text}
   </span>
+);
+const InfoItem = ({ icon, label, value, children }) => (
+  <div className="handler-info-item">
+    <div className="handler-info-icon">{children || <Icon type={icon} />}</div>
+    <div>
+      <div className="handler-info-label">{label}</div>
+      <div className="handler-info-value">{value}</div>
+    </div>
+  </div>
 );
 const { TabPane } = Tabs;
 const { confirm } = Modal;
@@ -228,35 +236,35 @@ function Handler(props) {
                 </div>
               }
             >
-              <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
-                <IconText type="team" text={handler.maxPlayers > 2 ? `2 - ${handler.maxPlayers} players` : '2 players'}
-                          key="max-players" />
-                <div style={{ width: '25px', display: 'inline-block' }}></div>
-
-                {handler.playableControllers && (<><Tooltip title={"Controller support"}>
-                  <ControllerIcon style={{ width: 22, height: 22, fill: '#8d8d8d', marginBottom:-6 }} />
-                </Tooltip><div style={{ width: '25px', display: 'inline-block' }}></div></>)}
-
-                {handler.playableMouseKeyboard && (<>
-                <Tooltip title={`${handler.playableMultiMouseKeyboard ? 'Multiple' : 'Single'} mouse + keyboard support`}>
-                  <KeyboardIcon style={{ width: 22, height: 22, fill: '#8d8d8d', marginBottom:-4 }} />
-                  {handler.playableMultiMouseKeyboard && (<KeyboardIcon style={{ width: 22, height: 22, fill: '#8d8d8d', marginBottom:-4 }} />)}
-                </Tooltip>
-                <div style={{ width: '25px', display: 'inline-block' }}></div></>)}
-                <IconText type="fire" text={counterFormatter(handler.stars)} key="total-stars" />
-                <div style={{ width: '25px', display: 'inline-block' }}></div>
-                <IconText
-                  type="download"
-                  text={counterFormatter(handler.downloadCount)}
-                  key="list-vertical-message"
+              <div className="handler-info">
+                <InfoItem
+                  icon="team"
+                  label="Max players"
+                  value={handler.maxPlayers > 2 ? `2 - ${handler.maxPlayers}` : '2'}
                 />
-                <div style={{ width: '25px', display: 'inline-block' }}></div>
-                <Link to={`/user/${handler.owner}`}><IconText type="user" text={handler.ownerName}
-                                                              key="list-vertical-like-o" /></Link>
+                <InfoItem
+                  label="Controller support"
+                  value={handler.playableControllers ? 'Supported' : 'Not supported'}
+                >
+                  <ControllerIcon className="handler-info-svg" />
+                </InfoItem>
+                <InfoItem
+                  label="Mouse + keyboard"
+                  value={handler.playableMouseKeyboard
+                    ? (handler.playableMultiMouseKeyboard ? 'Multiple' : 'Single')
+                    : 'Not supported'}
+                >
+                  <KeyboardIcon className="handler-info-svg" />
+                </InfoItem>
+                <InfoItem icon="fire" label="Hotness" value={counterFormatter(handler.stars)} />
+                <InfoItem icon="download" label="Downloads" value={counterFormatter(handler.downloadCount)} />
+                <Link className="handler-info-link" to={`/user/${handler.owner}`}>
+                  <InfoItem icon="user" label="Handler by" value={handler.ownerName} />
+                </Link>
               </div>
               <Content>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <div style={{ marginLeft:-45, paddingRight:25 }}>
+                <div className="handler-body">
+                  <div className="handler-body-content">
                     <Paragraph>
                       <ReactMarkdown source={handler.description} />
                     </Paragraph>
@@ -338,7 +346,7 @@ function Handler(props) {
                       </a>
                     </Row>
                   </div>
-                  <div style={{marginRight:-126, paddingLeft:26,marginTop:-84}}>
+                  <div className="handler-cover">
                     <img
                       src={
                         handler.gameCover !== 'no_cover'
@@ -364,7 +372,7 @@ function Handler(props) {
               >
                 <CommentSection handlerId={handler._id} />
               </TabPane>
-              <TabPane
+              {/* <TabPane
                 disabled={!handler.currentVersion}
                 tab={
                   <span>
@@ -375,7 +383,7 @@ function Handler(props) {
                 key="2"
               >
                 <ReadJs packageId={handler.currentPackage} />
-              </TabPane>
+              </TabPane> */}
               <TabPane
                 disabled={!handler.currentVersion}
                 tab={
