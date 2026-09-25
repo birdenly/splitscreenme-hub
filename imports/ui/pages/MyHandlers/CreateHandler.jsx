@@ -107,7 +107,7 @@ function CreateHandler(props) {
                       message: 'Please input a game name.',
                     },
                   ],
-                })(<Input placeholder="What game will you create a handler for ?" />)}
+                })(<Input placeholder="What game will you publish a handler for ?" />)}
               </Form.Item>
               <Form.Item {...formItemLayout} label="Filter PC platform only">
                 {getFieldDecorator('searchFilter')(<Checkbox  name="searchFilter" valuePropName="checked" defaultChecked />)}
@@ -202,7 +202,7 @@ function CreateHandler(props) {
         <Result
           status="500"
           title="Not logged in!"
-          subTitle="To create and manage your handlers, you must have an account and be logged in."
+          subTitle="To publish and manage your handlers, you must have an account and be logged in."
           extra={
             <Link
               onClick={() => {
