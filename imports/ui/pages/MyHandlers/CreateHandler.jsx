@@ -93,9 +93,9 @@ function CreateHandler(props) {
     <div>
       {props.loggedIn ? (
         <PageHeader
-          title="Create a new handler"
+          title="Publish a new handler"
           onBack={() => window.history.back()}
-          subTitle="Complete the form in order to create your handler"
+          subTitle="Complete the form in order to publish your handler."
         >
           <div className="content">
             <div className="main">
