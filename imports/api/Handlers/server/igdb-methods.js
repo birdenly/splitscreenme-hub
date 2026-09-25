@@ -49,6 +49,7 @@ Meteor.methods({
     if (!handler || !handler.gameId || !bearerToken) {
       return [];
     }
+    // if it already has genres, just use the stored ones. Maybe over time they can change? but idc
     if (Array.isArray(handler.genres) && handler.genres.length > 0) {
       return handler.genres;
     }
@@ -63,13 +64,16 @@ Meteor.methods({
         Accept: 'application/json',
       },
     });
-
+    // https://api-docs.igdb.com/#genre. not sure if this whole function should be added to ratelimit below.
     const gameResponse = await igdbApi.post('games', `fields genres.name; where id = ${handler.gameId};`);
+    // check return > return genre or nothing > turn to list
     const genres = (gameResponse.data[0]?.genres || []).map(genre => genre.name);
 
     if (!genres.length) {
       return [];
     }
+
+    genres.slice(0, 3); // limit just in case.
 
     Handlers.update(handlerId, { $set: { genres } });
 
