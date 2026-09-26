@@ -184,16 +184,7 @@ function Handler(props) {
         {handler ? (
           <React.Fragment>
             <PageHeader
-              title={
-                <span>
-                  {handler.gameName}
-                  {genres.length > 0 && (
-                    <span style={{ marginLeft: 12, fontSize: 14, fontWeight: 400 }}>
-                      {genres.join(' / ')}
-                    </span>
-                  )}
-                </span>
-              }
+              title={handler.gameName}
               subTitle={handler.title}
               tags={
                 handler.verified ? (
@@ -201,14 +192,14 @@ function Handler(props) {
                     placement="topRight"
                     title="The latest release of this handler has been validated and is safe to use."
                   >
-                    <Tag color="green"><Icon type="safety-certificate"  theme="filled" style={{ marginRight: 4 }} /> Verified</Tag>
+                    <Tag color="green"><Icon type="safety-certificate"  theme="filled" style={{ marginRight: 4 }} /> Handler Verified</Tag>
                   </Tooltip>
                 ) : (
                   <Tooltip
                     placement="bottomRight"
                     title="The latest release of this handler has not been verified. Check the FAQ for insight into the verification process."
                   >
-                    <Tag><Icon type="exclamation-circle"  style={{ marginRight: 4 }} /> Unverified</Tag>
+                    <Tag><Icon type="exclamation-circle"  style={{ marginRight: 4 }} /> Handler Unverified</Tag>
                   </Tooltip>
                 )
               }
@@ -236,6 +227,15 @@ function Handler(props) {
                 </div>
               }
             >
+              {genres.length > 0 && (
+                <div className="handler-genres">
+                  {genres.map(genre => (
+                    <Tag color="green" key={genre}>
+                      {genre}
+                    </Tag>
+                  ))}
+                </div>
+              )}
               <div className="handler-info">
                 <InfoItem
                   icon="team"

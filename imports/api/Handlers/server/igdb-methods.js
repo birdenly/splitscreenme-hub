@@ -73,11 +73,11 @@ Meteor.methods({
       return [];
     }
 
-    genres.slice(0, 3); // limit just in case.
+    const limitedGenres = genres.slice(0, 3); // limit just in case fo outliers.
 
-    Handlers.update(handlerId, { $set: { genres } });
+    Handlers.update(handlerId, { $set: { genres: limitedGenres } });
 
-    return genres;
+    return limitedGenres;
   },
 
   'handlers.seekGame': function handlersSeekGame(gameName, searchFilter = true) {
