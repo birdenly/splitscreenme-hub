@@ -10,6 +10,7 @@ import {
   Typography,
   Radio,
   AutoComplete,
+  Select,
   Tag,
 } from 'antd';
 import { withTracker } from 'meteor/react-meteor-data';
@@ -27,6 +28,7 @@ const { Meta } = Card;
 let avatars = new Avatars(sprites({}));
 
 const currentSearch = new ReactiveVar('');
+const currentGenreSearch = new ReactiveVar('');
 const currentOrder = new ReactiveVar('down');
 const currentSearchOption = new ReactiveVar('trend');
 const currentLimit = new ReactiveVar(18);
@@ -42,6 +44,15 @@ const IconText = ({ type, text, theme = 'outlined', color }) => (
 
 function Handlers(props) {
   const [searched, setSearched] = useState([]);
+  const [genres, setGenres] = useState([]);
+
+  useEffect(() => {
+    Meteor.call('handlers.listGenres', (error, result) => {
+      if (!error) {
+        setGenres(result || []);
+      }
+    });
+  }, []);
   const onSearch = () => {
     setSearched([
       ...new Set(
@@ -75,6 +86,11 @@ function Handlers(props) {
   const onChange = value => {
     currentLimit.set(18);
     value === undefined ? currentSearch.set('') : currentSearch.set(value);
+  };
+
+  const onGenreChange = value => {
+    currentLimit.set(18);
+    currentGenreSearch.set(value || undefined);
   };
 
   const onSortTypeChange = value => {
@@ -112,24 +128,38 @@ function Handlers(props) {
         <Title aria-label="aria-expanded">Explore handlers</Title>
         <Paragraph aria-label="aria-level">Search for games you like and play them with your friends.</Paragraph>
       </Typography>)}
-      <label htmlFor="handlers-search-autocomplete" aria-label="landmark">
-        <AutoComplete
-          id="handlers-search-autocomplete"
-          aria-label="search"
-          value={currentSearch.get()}
+      <div className="handlers-search-toolbar">
+        <label htmlFor="handlers-search-autocomplete" aria-label="landmark">
+          <AutoComplete
+            id="handlers-search-autocomplete"
+            aria-label="search"
+            value={currentSearch.get()}
+            allowClear={true}
+            dataSource={searched}
+            style={{ width: 350 }}
+            onSearch={onSearch}
+            onChange={onChange}
+            placeholder={`Search among ${totalHandlers} games...`}
+          />
+        </label>
+        <Select
           allowClear={true}
-          dataSource={searched}
+          value={currentGenreSearch.get() || undefined} // for select needs undefined, to show placeholder
+          placeholder="Filter by tag"
+          onChange={onGenreChange}
           style={{ width: 350 }}
-          onSearch={onSearch}
-          onChange={onChange}
-          placeholder={`Search among ${totalHandlers} games...`}
-        />
-      </label>
-      <Radio.Group
-        style={{ float:'right' }}
-        value={currentSearchOption.get()}
-        onChange={onSortTypeChange}
-      >
+        >
+          {genres.map(genre => (
+            <Select.Option key={genre} value={genre}>
+              {genre}
+            </Select.Option>
+          ))}
+        </Select>
+        <Radio.Group
+          className="handlers-sort-options"
+          value={currentSearchOption.get()}
+          onChange={onSortTypeChange}
+        >
         <Radio.Button onClick={onSortOrderChange} value="trend">
           {props.currentSearchOption === 'trend' && <Icon type={props.currentOrder} />} Trending
         </Radio.Button>
@@ -155,7 +185,8 @@ function Handlers(props) {
           </Radio.Button>
           </>
         )}
-      </Radio.Group>
+        </Radio.Group>
+      </div>
       <br />
       <Divider style={{opacity:0}} />
       <Spin spinning={props.loading}>
@@ -550,6 +581,7 @@ export default withTracker(() => {
       reactiveCurrentOrder,
       currentLimit.get(),
       Session.get('localHandlerLibraryArray')?.map(handler => handler.id) || [],
+      currentGenreSearch.get(),
     );
 
   const subscription = Meteor.subscribe(
@@ -558,6 +590,8 @@ export default withTracker(() => {
     currentSearchOption.get(),
     reactiveCurrentOrder,
     currentLimit.get(),
+    undefined,
+    currentGenreSearch.get(),
   );
 
 
