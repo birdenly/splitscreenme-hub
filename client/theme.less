@@ -43,6 +43,18 @@
   transform: scale(1.00) !important;
 }
 
+.handlers-search-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.handlers-sort-options {
+  margin-left: auto;
+}
+
 .handler-info {
   display: flex;
   flex-wrap: wrap;
@@ -138,6 +150,18 @@
 }
 
 @media (max-width: 600px) {
+  .handlers-search-toolbar {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .handlers-search-toolbar label,
+  .handlers-search-toolbar .ant-select,
+  .handlers-sort-options {
+    width: 100% !important;
+    margin-left: 0;
+  }
+
   .handler-info {
     gap: 16px 18px;
   }

@@ -128,20 +128,20 @@ function Handlers(props) {
         <Title aria-label="aria-expanded">Explore handlers</Title>
         <Paragraph aria-label="aria-level">Search for games you like and play them with your friends.</Paragraph>
       </Typography>)}
-      <label htmlFor="handlers-search-autocomplete" aria-label="landmark">
-        <AutoComplete
-          id="handlers-search-autocomplete"
-          aria-label="search"
-          value={currentSearch.get()}
-          allowClear={true}
-          dataSource={searched}
-          style={{ width: 350 }}
-          onSearch={onSearch}
-          onChange={onChange}
-          placeholder={`Search among ${totalHandlers} games...`}
-        />
-      </label>
-      <div style={{ marginTop: 10 }}>
+      <div className="handlers-search-toolbar">
+        <label htmlFor="handlers-search-autocomplete" aria-label="landmark">
+          <AutoComplete
+            id="handlers-search-autocomplete"
+            aria-label="search"
+            value={currentSearch.get()}
+            allowClear={true}
+            dataSource={searched}
+            style={{ width: 350 }}
+            onSearch={onSearch}
+            onChange={onChange}
+            placeholder={`Search among ${totalHandlers} games...`}
+          />
+        </label>
         <Select
           allowClear={true}
           value={currentGenreSearch.get() || undefined} // for select needs undefined, to show placeholder
@@ -155,12 +155,11 @@ function Handlers(props) {
             </Select.Option>
           ))}
         </Select>
-      </div>
-      <Radio.Group
-        style={{ float:'right' }}
-        value={currentSearchOption.get()}
-        onChange={onSortTypeChange}
-      >
+        <Radio.Group
+          className="handlers-sort-options"
+          value={currentSearchOption.get()}
+          onChange={onSortTypeChange}
+        >
         <Radio.Button onClick={onSortOrderChange} value="trend">
           {props.currentSearchOption === 'trend' && <Icon type={props.currentOrder} />} Trending
         </Radio.Button>
@@ -186,7 +185,8 @@ function Handlers(props) {
           </Radio.Button>
           </>
         )}
-      </Radio.Group>
+        </Radio.Group>
+      </div>
       <br />
       <Divider style={{opacity:0}} />
       <Spin spinning={props.loading}>
