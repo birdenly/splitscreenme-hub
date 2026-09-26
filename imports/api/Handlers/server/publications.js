@@ -15,9 +15,11 @@ Meteor.publish(
     handlerSortOrder = 'down',
     limit = 18,
     localHandlerIds = [],
+    handlerGenreSearch = '',
   ) {
-
-    const isSearchFromArray = localHandlerIds.length > 0;
+    // Protect from Cannot read property 'length' of null
+    const safeLocalHandlerIds = Array.isArray(localHandlerIds) ? localHandlerIds : [];
+    const isSearchFromArray = safeLocalHandlerIds.length > 0;
 
     let sortObject = { trendScore: handlerSortOrder === 'up' ? 1 : -1 };
 
@@ -36,18 +38,20 @@ Meteor.publish(
     if (handlerOptionSearch === 'alphabetical') {
       sortObject = { gameName: handlerSortOrder === 'up' ? -1 : 1 };
     }
-    const searchInArraySelectorCondition = isSearchFromArray > 0 ? {_id: { $in: localHandlerIds }} : {};
+    const searchInArraySelectorCondition = isSearchFromArray > 0 ? {_id: { $in: safeLocalHandlerIds } } : {};
+    const genreSelectorCondition = handlerGenreSearch ? { genres: { $regex: new RegExp(`^${escapeRegExp(handlerGenreSearch)}$`, 'i') } } : {};
 
     return Handlers.find(
       {
         ...searchInArraySelectorCondition,
+        ...genreSelectorCondition,
         gameName: { $regex: new RegExp(escapeRegExp(handlerTitleSearch)), $options: 'gi' },
         private: false,
         publicAuthorized: handlerOptionSearch !== 'unauthorized',
       },
       {
         sort: sortObject,
-        limit: Math.min(isSearchFromArray ? localHandlerIds.length : limit, 600),
+        limit: Math.min(isSearchFromArray ? safeLocalHandlerIds.length : limit, 600),
       },
     );
   },

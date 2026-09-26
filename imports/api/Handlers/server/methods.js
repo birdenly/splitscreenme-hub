@@ -26,6 +26,21 @@ Meteor.methods({
       handleMethodException(exception);
     }
   },
+  // Get all public handlers genres, no duplicates, sorted for the dropdown.
+  'handlers.listGenres': function handlersListGenres() {
+    try {
+      const genres = Handlers.find(
+        { private: false, publicAuthorized: true, genres: { $exists: true, $ne: [] } },
+        { fields: { genres: 1 } },
+      )
+        .fetch()
+        .reduce((allGenres, handler) => allGenres.concat(handler.genres || []), []);
+
+      return [...new Set(genres)].sort();
+    } catch (exception) {
+      handleMethodException(exception);
+    }
+  },
   'handlers.starring': function handlerStarring(handlerId) {
     check(handlerId, Match.OneOf(String, undefined));
     try {
