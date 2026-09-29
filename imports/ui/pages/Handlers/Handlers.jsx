@@ -28,7 +28,7 @@ const { Meta } = Card;
 let avatars = new Avatars(sprites({}));
 
 const currentSearch = new ReactiveVar('');
-const currentGenreSearch = new ReactiveVar('');
+const currentGenreSearch = new ReactiveVar([]);
 const currentOrder = new ReactiveVar('down');
 const currentSearchOption = new ReactiveVar('trend');
 const currentLimit = new ReactiveVar(18);
@@ -90,7 +90,7 @@ function Handlers(props) {
 
   const onGenreChange = value => {
     currentLimit.set(18);
-    currentGenreSearch.set(value || undefined);
+    currentGenreSearch.set(value || []);
   };
 
   const onSortTypeChange = value => {
@@ -143,9 +143,10 @@ function Handlers(props) {
           />
         </label>
         <Select
+          mode="multiple"
           allowClear={true}
-          value={currentGenreSearch.get() || undefined} // for select needs undefined, to show placeholder
-          placeholder="Filter by tag"
+          value={currentGenreSearch.get()}
+          placeholder="Filter by tags"
           onChange={onGenreChange}
           style={{ width: 350 }}
         >

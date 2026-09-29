@@ -39,7 +39,16 @@ Meteor.publish(
       sortObject = { gameName: handlerSortOrder === 'up' ? -1 : 1 };
     }
     const searchInArraySelectorCondition = isSearchFromArray > 0 ? {_id: { $in: safeLocalHandlerIds } } : {};
-    const genreSelectorCondition = handlerGenreSearch ? { genres: { $regex: new RegExp(`^${escapeRegExp(handlerGenreSearch)}$`, 'i') } } : {};
+    
+    // Will either get an array or a string (first one). so if not array > make array ... is array > continue
+    const genreSearches = Array.isArray(handlerGenreSearch)
+      ? handlerGenreSearch
+      : handlerGenreSearch
+        ? [handlerGenreSearch]
+        : [];
+    const genreSelectorCondition = genreSearches.length
+      ? { genres: { $all: genreSearches.map(genre => new RegExp(`^${escapeRegExp(genre)}$`, 'i')) } } //all = must have all, similar to steam/steamdb
+      : {};
 
     return Handlers.find(
       {
