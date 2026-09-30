@@ -26,7 +26,7 @@ const refreshBearer = () => {
         console.log(err);
       }
       if (res.data && res.data.access_token) {
-        console.log('Acces token correctly refreshed.');
+        console.log('Access token correctly refreshed.');
         bearerToken = res.data.access_token;
       }
     },
