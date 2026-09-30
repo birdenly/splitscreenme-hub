@@ -151,7 +151,7 @@ function Handlers(props) {
           style={{ width: 350 }}
         >
           <Select.Option value="support:controller">Controller support</Select.Option>
-          <Select.Option value="support:KeyboardMouse">1 Keyboard/mouse support</Select.Option>
+          <Select.Option value="support:KeyboardMouse">Single Keyboard/mouse support</Select.Option>
           <Select.Option value="support:MultiKeyboardMouse">Multiple Keyboard/mouse support</Select.Option>
           {genres.map(genre => (
             <Select.Option key={genre} value={genre}>
