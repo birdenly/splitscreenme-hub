@@ -15,7 +15,7 @@ Meteor.publish(
     handlerSortOrder = 'down',
     limit = 18,
     localHandlerIds = [],
-    handlerGenreSearch = '',
+    handlerTagSearch = '',
   ) {
     // Protect from Cannot read property 'length' of null
     const safeLocalHandlerIds = Array.isArray(localHandlerIds) ? localHandlerIds : [];
@@ -41,19 +41,37 @@ Meteor.publish(
     const searchInArraySelectorCondition = isSearchFromArray > 0 ? {_id: { $in: safeLocalHandlerIds } } : {};
     
     // Will either get an array or a string (first one). so if not array > make array ... is array > continue
-    const genreSearches = Array.isArray(handlerGenreSearch)
-      ? handlerGenreSearch
-      : handlerGenreSearch
-        ? [handlerGenreSearch]
+    const tagSearches = Array.isArray(handlerTagSearch)
+      ? handlerTagSearch
+      : handlerTagSearch
+        ? [handlerTagSearch]
         : [];
+        
+    const genreSearches = tagSearches.filter(tag => !tag.startsWith('support:'));
     const genreSelectorCondition = genreSearches.length
       ? { genres: { $all: genreSearches.map(genre => new RegExp(`^${escapeRegExp(genre)}$`, 'i')) } } //all = must have all, similar to steam/steamdb
+      : {};
+
+    const compatibilitySelectorConditions = [];
+    if (tagSearches.includes('support:controller')) {
+      compatibilitySelectorConditions.push({ playableControllers: true });
+    }
+    if (tagSearches.includes('support:KeyboardMouse')) {
+      compatibilitySelectorConditions.push({ playableMouseKeyboard: true, playableMultiMouseKeyboard: false });
+    }
+    if (tagSearches.includes('support:MultiKeyboardMouse')) {
+      compatibilitySelectorConditions.push({ playableMouseKeyboard: true, playableMultiMouseKeyboard: true });
+    }
+
+    const compatibilitySelectorCondition = compatibilitySelectorConditions.length
+      ? { $and: compatibilitySelectorConditions }
       : {};
 
     return Handlers.find(
       {
         ...searchInArraySelectorCondition,
         ...genreSelectorCondition,
+        ...compatibilitySelectorCondition,
         gameName: { $regex: new RegExp(escapeRegExp(handlerTitleSearch)), $options: 'gi' },
         private: false,
         publicAuthorized: handlerOptionSearch !== 'unauthorized',

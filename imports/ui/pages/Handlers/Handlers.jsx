@@ -28,7 +28,7 @@ const { Meta } = Card;
 let avatars = new Avatars(sprites({}));
 
 const currentSearch = new ReactiveVar('');
-const currentGenreSearch = new ReactiveVar([]);
+const currentTagSearch = new ReactiveVar([]);
 const currentOrder = new ReactiveVar('down');
 const currentSearchOption = new ReactiveVar('trend');
 const currentLimit = new ReactiveVar(18);
@@ -90,7 +90,7 @@ function Handlers(props) {
 
   const onGenreChange = value => {
     currentLimit.set(18);
-    currentGenreSearch.set(value || []);
+    currentTagSearch.set(value || []);
   };
 
   const onSortTypeChange = value => {
@@ -145,11 +145,14 @@ function Handlers(props) {
         <Select
           mode="multiple"
           allowClear={true}
-          value={currentGenreSearch.get()}
+          value={currentTagSearch.get()}
           placeholder="Filter by tags"
           onChange={onGenreChange}
           style={{ width: 350 }}
         >
+          <Select.Option value="support:controller">Controller support</Select.Option>
+          <Select.Option value="support:KeyboardMouse">1 Keyboard/mouse support</Select.Option>
+          <Select.Option value="support:MultiKeyboardMouse">Multiple Keyboard/mouse support</Select.Option>
           {genres.map(genre => (
             <Select.Option key={genre} value={genre}>
               {genre}
@@ -582,7 +585,7 @@ export default withTracker(() => {
       reactiveCurrentOrder,
       currentLimit.get(),
       Session.get('localHandlerLibraryArray')?.map(handler => handler.id) || [],
-      currentGenreSearch.get(),
+      currentTagSearch.get(),
     );
 
   const subscription = Meteor.subscribe(
@@ -592,7 +595,7 @@ export default withTracker(() => {
     reactiveCurrentOrder,
     currentLimit.get(),
     undefined,
-    currentGenreSearch.get(),
+    currentTagSearch.get(),
   );
 
 
