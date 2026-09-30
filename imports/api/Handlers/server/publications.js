@@ -47,7 +47,9 @@ Meteor.publish(
         ? [handlerTagSearch]
         : [];
         
-    const genreSearches = tagSearches.filter(tag => !tag.startsWith('support:'));
+    const genreSearches = tagSearches.filter(
+      tag => !tag.startsWith('support:') && !tag.startsWith('players:'),
+    );
     const genreSelectorCondition = genreSearches.length
       ? { genres: { $all: genreSearches.map(genre => new RegExp(`^${escapeRegExp(genre)}$`, 'i')) } } //all = must have all, similar to steam/steamdb
       : {};
@@ -66,12 +68,27 @@ Meteor.publish(
     const compatibilitySelectorCondition = compatibilitySelectorConditions.length
       ? { $and: compatibilitySelectorConditions }
       : {};
+      
+    const playerCountSelectorConditions = [];
+    if (tagSearches.includes('players:2-4')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 2, $lte: 4 } });
+    }
+    if (tagSearches.includes('players:5-8')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 5, $lte: 8 } });
+    }
+    if (tagSearches.includes('players:9-plus')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 9 } });
+    }
+    const playerCountSelectorCondition = playerCountSelectorConditions.length
+      ? { $or: playerCountSelectorConditions }
+      : {};
 
     return Handlers.find(
       {
         ...searchInArraySelectorCondition,
         ...genreSelectorCondition,
         ...compatibilitySelectorCondition,
+        ...playerCountSelectorCondition,
         gameName: { $regex: new RegExp(escapeRegExp(handlerTitleSearch)), $options: 'gi' },
         private: false,
         publicAuthorized: handlerOptionSearch !== 'unauthorized',

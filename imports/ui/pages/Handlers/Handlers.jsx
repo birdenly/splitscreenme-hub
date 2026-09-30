@@ -153,6 +153,9 @@ function Handlers(props) {
           <Select.Option value="support:controller">Controller support</Select.Option>
           <Select.Option value="support:KeyboardMouse">Single Keyboard/mouse support</Select.Option>
           <Select.Option value="support:MultiKeyboardMouse">Multiple Keyboard/mouse support</Select.Option>
+          <Select.Option value="players:2-4">2-4 players</Select.Option>
+          <Select.Option value="players:5-8">5-8 players</Select.Option>
+          <Select.Option value="players:9-plus">9+ players</Select.Option>
           {genres.map(genre => (
             <Select.Option key={genre} value={genre}>
               {genre}
