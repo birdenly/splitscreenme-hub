@@ -15,7 +15,7 @@ Meteor.publish(
     handlerSortOrder = 'down',
     limit = 18,
     localHandlerIds = [],
-    handlerGenreSearch = '',
+    handlerTagSearch = '',
   ) {
     // Protect from Cannot read property 'length' of null
     const safeLocalHandlerIds = Array.isArray(localHandlerIds) ? localHandlerIds : [];
@@ -39,12 +39,56 @@ Meteor.publish(
       sortObject = { gameName: handlerSortOrder === 'up' ? -1 : 1 };
     }
     const searchInArraySelectorCondition = isSearchFromArray > 0 ? {_id: { $in: safeLocalHandlerIds } } : {};
-    const genreSelectorCondition = handlerGenreSearch ? { genres: { $regex: new RegExp(`^${escapeRegExp(handlerGenreSearch)}$`, 'i') } } : {};
+    
+    // Will either get an array or a string (first one). so if not array > make array ... is array > continue
+    const tagSearches = Array.isArray(handlerTagSearch)
+      ? handlerTagSearch
+      : handlerTagSearch
+        ? [handlerTagSearch]
+        : [];
+        
+    const genreSearches = tagSearches.filter(
+      tag => !tag.startsWith('support:') && !tag.startsWith('players:'),
+    );
+    const genreSelectorCondition = genreSearches.length
+      ? { genres: { $all: genreSearches.map(genre => new RegExp(`^${escapeRegExp(genre)}$`, 'i')) } } //all = must have all, similar to steam/steamdb
+      : {};
+
+    const compatibilitySelectorConditions = [];
+    if (tagSearches.includes('support:controller')) {
+      compatibilitySelectorConditions.push({ playableControllers: true });
+    }
+    if (tagSearches.includes('support:KeyboardMouse')) {
+      compatibilitySelectorConditions.push({ playableMouseKeyboard: true, playableMultiMouseKeyboard: false });
+    }
+    if (tagSearches.includes('support:MultiKeyboardMouse')) {
+      compatibilitySelectorConditions.push({ playableMouseKeyboard: true, playableMultiMouseKeyboard: true });
+    }
+
+    const compatibilitySelectorCondition = compatibilitySelectorConditions.length
+      ? { $and: compatibilitySelectorConditions }
+      : {};
+      
+    const playerCountSelectorConditions = [];
+    if (tagSearches.includes('players:2-4')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 2, $lte: 4 } });
+    }
+    if (tagSearches.includes('players:5-8')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 5, $lte: 8 } });
+    }
+    if (tagSearches.includes('players:9-plus')) {
+      playerCountSelectorConditions.push({ maxPlayers: { $gte: 9 } });
+    }
+    const playerCountSelectorCondition = playerCountSelectorConditions.length
+      ? { $or: playerCountSelectorConditions }
+      : {};
 
     return Handlers.find(
       {
         ...searchInArraySelectorCondition,
         ...genreSelectorCondition,
+        ...compatibilitySelectorCondition,
+        ...playerCountSelectorCondition,
         gameName: { $regex: new RegExp(escapeRegExp(handlerTitleSearch)), $options: 'gi' },
         private: false,
         publicAuthorized: handlerOptionSearch !== 'unauthorized',

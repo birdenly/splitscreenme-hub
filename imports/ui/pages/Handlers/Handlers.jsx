@@ -28,7 +28,7 @@ const { Meta } = Card;
 let avatars = new Avatars(sprites({}));
 
 const currentSearch = new ReactiveVar('');
-const currentGenreSearch = new ReactiveVar('');
+const currentTagSearch = new ReactiveVar([]);
 const currentOrder = new ReactiveVar('down');
 const currentSearchOption = new ReactiveVar('trend');
 const currentLimit = new ReactiveVar(18);
@@ -90,7 +90,7 @@ function Handlers(props) {
 
   const onGenreChange = value => {
     currentLimit.set(18);
-    currentGenreSearch.set(value || undefined);
+    currentTagSearch.set(value || []);
   };
 
   const onSortTypeChange = value => {
@@ -143,12 +143,19 @@ function Handlers(props) {
           />
         </label>
         <Select
+          mode="multiple"
           allowClear={true}
-          value={currentGenreSearch.get() || undefined} // for select needs undefined, to show placeholder
-          placeholder="Filter by tag"
+          value={currentTagSearch.get()}
+          placeholder="Filter by tags"
           onChange={onGenreChange}
           style={{ width: 350 }}
         >
+          <Select.Option value="support:controller">Controller support</Select.Option>
+          <Select.Option value="support:KeyboardMouse">Single Keyboard/mouse support</Select.Option>
+          <Select.Option value="support:MultiKeyboardMouse">Multiple Keyboard/mouse support</Select.Option>
+          <Select.Option value="players:2-4">2-4 Players</Select.Option>
+          <Select.Option value="players:5-8">5-8 Players</Select.Option>
+          <Select.Option value="players:9-plus">9+ Players</Select.Option>
           {genres.map(genre => (
             <Select.Option key={genre} value={genre}>
               {genre}
@@ -581,7 +588,7 @@ export default withTracker(() => {
       reactiveCurrentOrder,
       currentLimit.get(),
       Session.get('localHandlerLibraryArray')?.map(handler => handler.id) || [],
-      currentGenreSearch.get(),
+      currentTagSearch.get(),
     );
 
   const subscription = Meteor.subscribe(
@@ -591,7 +598,7 @@ export default withTracker(() => {
     reactiveCurrentOrder,
     currentLimit.get(),
     undefined,
-    currentGenreSearch.get(),
+    currentTagSearch.get(),
   );
 
 
