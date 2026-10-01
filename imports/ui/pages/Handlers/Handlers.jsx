@@ -125,8 +125,19 @@ function Handlers(props) {
   return (
     <div>
       {!isFromWebview.get() && (<Typography>
-        <Title aria-label="aria-expanded">Explore handlers</Title>
+        <div className="handlers-title">
+          <img src="../NucleusCoop.png" alt="Nucleus Co-op" />
+          <Title aria-label="aria-expanded">Explore handlers</Title>
+        </div>
         <Paragraph aria-label="aria-level">Search for games you like and play them with your friends.</Paragraph>
+        <Paragraph aria-label="aria-level">
+          Join the Nucleus Co-op Community:{' '}
+          <a href="https://www.reddit.com/r/nucleuscoop/" target="_blank">Reddit</a>
+          {' '} - {' '}
+          <a href="https://discord.gg/QDUt8HpCvr" target="_blank">Discord</a>
+          {' '} - {' '}
+          <a href="https://www.patreon.com/nucleus_coop" target="_blank">Patreon</a>
+        </Paragraph>
       </Typography>)}
       <div className="handlers-search-toolbar">
         <label htmlFor="handlers-search-autocomplete" aria-label="landmark">
