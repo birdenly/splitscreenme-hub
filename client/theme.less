@@ -51,6 +51,22 @@
   margin-bottom: 16px;
 }
 
+.handlers-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.handlers-title img {
+  width: 54px;
+  height: 56px;
+}
+
+.handlers-title .ant-typography {
+  position: relative;
+  top: 9px;
+}
+
 .handlers-sort-options {
   margin-left: auto;
 }
@@ -150,6 +166,11 @@
 }
 
 @media (max-width: 600px) {
+  .handlers-intro {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
   .handlers-search-toolbar {
     align-items: stretch;
     flex-wrap: wrap;
